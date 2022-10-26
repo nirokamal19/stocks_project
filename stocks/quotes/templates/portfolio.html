@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load humanize %}
+
+<style>
+  .btn-sm {
+    padding: .30rem .5rem;
+    font-size: .875rem;
+    line-height: .5;
+    border-radius: .2rem;
+    width: 5rem;
+  }
+</style>
+
+<h1>My Portfolio</h1>
+<br />
+
+<form action={% url 'portfolio' %} class="d-flex" method="POST">
+  {% csrf_token%}
+  <input class="form-inline me-2" type="search" placeholder="Add to Portfolio" aria-label="Search" name="ticker">
+  <button class="btn btn-outline-success" type="submit">Search</button>
+</form>
+
+<br />
+
+{% comment %} Table of Stocks {% endcomment %}
+
+</br>
+
+<div class="flexbox">
+  <div class="row">
+    <div class="col-10 " style="flex: 10; overflow: auto;">
+      <table class="table table-bordered table-striped table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th class="text-nowrap" scope="col">Company</th>
+            <th class="text-nowrap" scope="col">Stock Price</th>
+            <th class="text-nowrap" scope="col">Previous Close</th>
+            <th class="text-nowrap" scope="col">Market Cap</th>
+            <th class="text-nowrap" scope="col">YTD Change</th>
+            <th class="text-nowrap" scope="col">52 Wk High</th>
+            <th class="text-nowrap" scope="col">52 Wk Low</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if ticker %}
+          {% for list_item in output %}
+          <tr>
+            <th class="text-nowrap">{{list_item.companyName}}</th>
+            <td class="text-nowrap">{{list_item.latestPrice}} {{list_item.currency}}</td>
+            <td class="text-nowrap">{{list_item.previousClose}} {{list_item.currency}}</td>
+            <td class="text-nowrap">{{list_item.marketCap|intcomma}}</td>
+            <td class="text-nowrap">{{list_item.ytdChange|floatformat:3}} % </td>
+            <td class="text-nowrap">{{list_item.week52High}} {{list_item.currency}}</td>
+            <td class="text-nowrap">{{list_item.week52Low}} {{list_item.currency}}</td>
+          </tr>
+          {% endfor %}
+
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="col-1.5" style="flex: 1.5; overflow: auto;">
+      <table class="table table-bordered">
+        <thead class="table">
+          <tr style="border-color:white;">
+            <th scope="col">Remove</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in ticker %}
+          <tr>
+            <td style="border-color:white;"><a href="{% url 'delete' item.id %}"> <button type="button"
+                  class="btn btn-danger btn-sm btn-block">{{item}}</button>
+              </a> </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<br /><br />
+
+
+{% endblock %}
+
+
+
+
+{% comment %} {% for item in ticker %}
+{{ item }} <a href="{% url 'delete' item.id %}"> Delete </a> <br />
+{% endfor %} {% endcomment %}
